@@ -1,0 +1,9 @@
+.com1{
+  background: red;
+  border: 5rpx dashed green;
+}
+.com2{
+  color: peru;
+  font-size: 30rpx;
+  background: yellow
+}

@@ -1,0 +1,9 @@
+{
+  "usingComponents": {},
+  "navigationBarBackgroundColor": "#f20",
+  "navigationBarTitleText": "小李",
+  "navigationBarTextStyle": "white",
+  "backgroundColor":"#00ff00",
+  "backgroundTextStyle":"dark" ,
+  "enablePullDownRefresh": true
+}

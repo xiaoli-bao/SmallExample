@@ -1,0 +1,6 @@
+/* pages/page1/page1.wxss */
+@import "/common/common";
+
+.btn {
+  background: pink
+}
