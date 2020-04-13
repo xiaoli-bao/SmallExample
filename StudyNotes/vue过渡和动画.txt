@@ -1,0 +1,141 @@
+﻿==============Vue过渡和动画================
+
+一、Vue过渡和动画的作用
+
+       大幅度提高用户的体验，更好的体验页面的功能。
+       
+   Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用过渡效果。
+       包括以下实现方式：
+      1、在 CSS过渡和动画中自动应用 class
+      2、可以配合使用第三方 CSS 动画库，如 Animate.css
+      3、在过渡钩子函数中使用 JavaScript 直接操作 DOM
+      4、可以配合使用第三方 JavaScript动画库，如 Velocity.js    
+
+二、Vue过渡
+
+   1、Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用过渡效果。
+   2、Vue 提供了内置的过渡封装组件，该组件用于包裹要实现过渡效果的组件。     
+
+   
+三、过渡语法格式和使用方式
+
+   <transition>
+       <div>被过渡的元素</div>
+   </transition>  
+   
+        定义过渡动画的步骤：
+        
+        1、将需要被设置为过渡动画的元素使用   transition 标签进行包裹。
+            <transition>
+		    	<h1 v-show="flag">过渡动画测试文本</h1>
+		    </transition>
+		    
+        2、通过vue提供的过渡动画的内置class进行设置样式 和 引用过渡动画。
+            //设置样式
+           .v-enter , .v-leave-to  {
+               opacity: 0;
+               transform: translateX(200px);
+            }
+            //引用过渡动画
+           .v-enter-active, .v-leave-active {
+                transition: all 5s ease;
+            }
+
+四、自定义过渡动画的名称进行区分
+
+                     对于这些在过渡中切换的类名来说，如果你使用一个没有名字的 <transition>，则 v- 是这些类名的默认前缀。
+                     如果你使用了 <transition name="my-transition">，那么 v-enter 会替换为 my-transition-enter。
+                     在使用的过程中可以通过这种方式进行区分使用。              
+        
+五、使用第三方Animate.css[强大的css3动画库]来实现更多的动画效果
+
+           对于比较复杂的过渡动画效果，我们可以通过Animate.css来进行实现，会比较方便。
+           
+           官方网址： https://daneden.github.io/animate.css/
+           
+           中文网： http://www.animate.net.cn/       
+           
+    使用步骤：
+    
+    1、第一步. 下载并引入animate.css文件。
+       
+       <link rel="stylesheet" href="animate.min.css">
+       
+    2、第二步. 给指定的元素加上指定的动画样式名。
+    
+              第一个animated是必须添加的样式名，第二个是指定的动画样式名。
+       <div class="animated fadeInUp"></div>
+    
+           注意：在vue中我们可以结合内置的class来进行很好的设置过渡动画。
+        
+                      入场阶段：enter-active-class   
+                      离场阶段：leave-active-class    
+                      
+                    注意：以上的两个（入场、离场表示的是在transition中可以使用的属性的名称）
+                                              
+           
+        <transition enter-active-class="animated bounceInRight"  leave-active-class="animated bounceOutLeft">
+		    	<h1 v-show="flag">过渡动画测试文本</h1>
+		</transition>    
+		
+		提示：
+		1、以上的实现过程中，为了避免重复的编写animated，也可以直接在h1的元素上 以class的方式进行统一的定义 ：
+		<h1 v-show="flag"  class="animated">过渡动画测试文本</h1>
+		
+		2、也可以独立的设置入场和离场的时间，通过动态绑定属性:duration 来进行统一设置。
+		  <transition enter-active-class="animated bounceInRight"  leave-active-class="animated bounceOutLeft"  :duration="300">
+		    	<h1 v-show="flag">过渡动画测试文本</h1>
+		  </transition> 
+		  
+		3、也可以分开来设置入场和离场的时间。
+		  <transition enter-active-class="animated bounceInRight"  leave-active-class="animated bounceOutLeft"  :duration="{enter:200,leave:300}">
+		    	<h1 v-show="flag">过渡动画测试文本</h1>
+		  </transition>    
+
+六、利用javascript钩子函数来实现过渡和动画
+
+           过渡动画的生命周期函数
+        <transition
+		  v-on:before-enter="beforeEnter"
+		  v-on:enter="enter"
+		  v-on:after-enter="afterEnter"
+		  v-on:enter-cancelled="enterCancelled"
+		
+		  v-on:before-leave="beforeLeave"
+		  v-on:leave="leave"
+		  v-on:after-leave="afterLeave"
+		  v-on:leave-cancelled="leaveCancelled">
+
+        </transition>   
+
+           使用步骤解析：
+        1、使用transition定义过渡动画元素，并且绑定与生命周期相关的事件
+        <transition v-on:before-enter="beforeEnter"   v-on:enter="enter"  v-on:after-enter="afterEnter">
+			   动画绑定元素定义...
+		</transition>
+        
+        2、在vue实例中通过methods定义各种钩子函数，来完成相应的各种操作
+        
+                methods:{
+					beforeEnter:function(el){
+						...
+					},
+					enter:function(el,done){
+						...
+						done() //执行生命周期的后续函数
+					},
+					afterEnter(el){
+						...
+					}
+					...
+				}
+     	
+     	3、钩子函数中参数的解释：
+     	    a、el：表示的是当前被设置过渡动画的元素本身。
+     	    b、done：表示的是后续的函数的引用，一般使用在enter 和 leave 中。	 
+     	    
+
+七、transition-group实现过渡动画
+
+          
+

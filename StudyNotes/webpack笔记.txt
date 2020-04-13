@@ -1,0 +1,306 @@
+﻿======================Webpack==================
+
+前提：
+
+1、必须要安装了Node.js。
+
+2、最好安装一个cnpm 。
+
+3、安装了一个全局的 webpack  版本号为：4.28.1
+
+
+demo-01
+
+一、使用webpack基础环境进行js的转换？
+
+1、进入项目的根目录
+
+2、进行项目的初始化
+   
+     cnpm init  |   cnpm  init -y
+     
+3、执行命令后，就会在项目中产生一个配置清单文件 package.json  
+
+               说明：本项目中所依赖的模块
+
+4、安装jquery模块（产生才node_modules中）
+
+     cnpm  i  jquery
+     
+5、由于src\app.js中使用了高级的语法特性，无法在浏览器中进行执行，所以我们需要使用webpack进行重新编译。
+
+     webpack  .\src\app.js -o  .\dist\bundle.js    
+     
+6、就会在dist目录下生成一个bundle.js文件，直接在html页面中引用这个js即可完成正常的操作。
+
+
+接下来就是在现有的基础上进行相关的优化处理
+
+   思路：将目前使用的webpack  .\src\app.js -o  .\dist\bundle.js 命令在配置文件中进行定义。
+   
+ 
+   
+
+demo-02
+
+将目前使用的webpack  .\src\app.js -o  .\dist\bundle.js 命令在配置文件中进行定义。
+
+1、在项目的根目录中创建一个webpack.config.js配置文件。
+
+     配置文件中核心的内容：              
+        a、入口              
+        b、出口      
+    //模块导出
+	module.exports={
+		entry:'./src/app.js',
+		output:{
+			filename:'bundle.js'
+		}	
+	}  
+
+此时，从理论上来讲，我们想通过直接执行webpack命令来完成。
+
+配置文件webpack.config.js的加载和执行原理：
+
+   1、首先从执行的dos命令中进行提取。
+   
+   2、再次自动查找webpack.config.js配置文件。  执行的时候使用webpack
+   
+
+demo-03【使用webpack-dev-server完成代码监听和自动编译】
+
+使用步骤和流程：
+
+1、项目本地安装webpack-dev-server工具，可以实时监听代码的改变,进行自动编译。此工具可以执行webpack所有的操作。
+
+2、通过scripts节点进行命令的配置
+
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"webpack-dev-server --open  --contentBase src --hot"
+  }
+
+3、通过npm  run  dev 来进行执行，但是会报出异常，强制要求安装本地的webpack
+
+       使用   cnpm i  webpack -D  进行项目本地安装webpack
+
+4、安装后，执行npm  run  dev命令，提示强制进行本地安装webpack-cli
+
+       使用 cnpm i  webpack-cli -D 进行本地安装
+
+5、此时就是在项目的根目录下生成一个bundle.js文件，这是托管在虚拟内存中。
+
+        用法：我们的页面就可以引用这个文件来使用js，这个js没有保存在物理的磁盘上，而是以虚拟的形式托管在项目的根目录中。
+
+
+demo-04【将html页面托管到内存中】
+
+webpack中插件的使用  --  html-webpack-plugin 插件
+
+在webpack中使用插件的步骤和流程：
+
+  1、安装html-webpack-plugin插件的依赖。
+  
+    cnpm i  html-webpack-plugin  -D
+    
+  2、在webpack的核心配置文件中webpack.config.js,做出如下的配置：
+  
+    //导入html-webpack-plugin的插件
+    const htmlPlugin = require('html-webpack-plugin')
+  
+    plugins:[
+	   //通过构造来创建出具体的插件对象
+	   new htmlPlugin({
+	   	   //指定的模板（html源文件）
+	   	   template:path.join(__dirname,'./src/index.html'),
+	   	   //指定在内存中存在的html页面的名称
+	   	   filename:'index.html'
+	   })
+	]
+	
+   3、使用npm  run  dev执行，就可以访问到项目根目录下的这个index.html文件。
+   
+                注意：这个html文件就被托管到了内存中，并且引用了内存中的bundle.js文件【高效】	
+                
+                
+demo-05【将项目中的css样式使用loader加载器进行加载----css文件】
+
+1、在app.js中导入项目中定义的css文件
+
+      src----
+         css---
+            index.css文件
+     
+            
+   import './css/index.css'
+   
+
+2、想要打包css文件需要安装 style-loader 和 css-loader 加载器
+
+   cnpm i  style-loader css-loader -D
+   
+3、在webpack.config.js中新增一个配置节点module对象，在对象中有一个rules属性【是一个数组】，这个数组中
+       保存了所有的第三方文件的匹配和处理规则  
+       
+    module:{  //配置所有的三方模块的加载器
+       rules:[
+          {test:/\.css$/,use:['style-loader','css-loader']}
+          //test就是正则中的匹配方法，定义的是正则的表示方式
+       ]
+    }    
+
+实现的是使用各种加载器完成对css样式的加载        
+
+
+css样式：
+
+    css原始语法
+    
+    less语法
+    
+    sass语法-----scss语法
+
+demo-06【将项目中的样式使用loader加载器进行加载---less文件】
+       
+1、在app.js中导入项目中定义的less文件
+
+      src----
+         css---
+            index.less文件
+     
+            
+   import './css/index.less'
+
+2、想要打包less文件需要安装 less-loader 加载器
+
+   cnpm i  less-loader -D
+   
+        在安装less-loader的过程中，需要我们强制的安装  less依赖。less-loader内部需要less进行支持。
+    
+   cnpm i  less -D    
+        
+   
+3、在webpack.config.js中的module对象中新增配置信息，在rules属性【是一个数组】，这个数组中
+       新增匹配和处理规则  
+       
+    module:{  //配置所有的三方模块的加载器
+       rules:[
+          {test:/\.css$/,use:['style-loader','css-loader']},
+          {test:/\.less$/,use:['style-loader','css-loader','less-loader']}
+       ]
+    }   
+  
+  
+demo-07【将项目中的样式使用loader加载器进行加载---sass文件】
+
+早期： xxx.sass文件     -----   xxx.scss文件
+
+
+  1、在app.js中导入项目中定义的sass文件
+
+      src----
+         css---
+            index.scss文件
+     
+            
+   import './css/index.scss'
+
+2、想要打包sass文件需要安装 sass-loader 加载器
+
+   cnpm i  sass-loader -D
+   
+        在安装sass-loader 的过程中要求我们强制安装 node-sass 、sass 、 fibers 
+        
+    cnpm i  node-sass -D  
+    
+    cnpm i  sass -D 
+    
+    cnpm i  fibers -D                    
+   
+3、在webpack.config.js中的module对象中新增配置信息，在rules属性【是一个数组】，这个数组中
+       新增匹配和处理规则  
+       
+    module:{  //配置所有的三方模块的加载器
+       rules:[
+          {test:/\.css$/,use:['style-loader','css-loader']},
+          {test:/\.less$/,use:['style-loader','css-loader','less-loader']},
+          {test:/\.scss$/,use:['style-loader','css-loader','sass-loader']}
+       ]
+    }   
+   
+
+demo-08【将项目中的样式使用loader加载器进行加载---url资源】
+
+url-loader的使用
+
+使用的流程和步骤：
+
+    1、在项目中的src下创建一个images目录，在目录中保存有图片资源
+
+      src----
+         images---
+            xxx.jpg
+     
+    xxx.jpg文件，在使用的过程中有哪些形式：
+      <img src="....路径....."/>
+      css|less|scss文件中定义背景图片
+      background:url('....路径....')
+      
+                  路径----->url
+                 
+      url-loader加载器                     
+
+    2、安装url-loader加载器
+    
+       cnpm i  url-loader -D
+       
+                    需要强制进行安装 file-loader加载器,来针对文件进行处理
+       cnpm i  file-loader -D
+    
+    
+    3、在webpack.config.js中的module对象中新增配置信息，在rules属性【是一个数组】，这个数组中
+                  新增匹配和处理规则    规则+加载器
+
+        module:{  //配置所有的三方模块的加载器
+          rules:[
+            {test:/\.css$/,use:['style-loader','css-loader']},
+            {test:/\.less$/,use:['style-loader','css-loader','less-loader']},
+            {test:/\.scss$/,use:['style-loader','css-loader','sass-loader']},
+            {test:/\.jpg$/,use:'url-loader'}
+        ]
+    }  
+    
+           通过页面进行检查，我们会发现一些细节性的特点：（属性需要讲解）
+           
+    base64编码格式：用于处理比较小的图片资源。
+    
+            可以通过配置文件中的规则+加载器（进行相应的设置处理）
+    {test:/\.jpg$/,use:'url-loader?limit=字节数&name=[name].[ext]'}
+    
+    limit:限制，限定的意思。MySQL数据库中进行分页的时候，使用的就是limit
+    
+        limit:字节数大小。
+       
+	                     只要我们引入的图片在这个字节范围之内，那么使用的就是base64编码形式。
+	                     
+	                     如果真实的图片大小超出设置的范围，那么就是通过一个hash算法产生的一个随机的图片的名称。主要避免重名。
+       
+                                   
+    
+    name:资源的名称相关的处理：
+    
+       name=[name].[ext]  :表示的是url中引用的图片的名称和后缀就是原来本身的  名字.后缀。
+       name=[hash]_[name].[ext]  :表示的是url中引用的图片的名称和后缀就是原来本身的  名字.后缀。
+       
+       
+
+               
+           
+    
+    
+    
+    
+    
+
+
+
